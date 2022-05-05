@@ -1,6 +1,6 @@
 /*
  * Copyright 2022 Emiliano Gonzalez LU3VEA (egonzalez . hiperion @ gmail . com))
- * * Project Site:  *
+ * * Project Site:  https://github.com/hiperiondev/evm *
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ enum vm_stack {
     STK_DRS = 0x04, // depth of return stack (double literal)
     STK_SSP = 0x05, // set data stack depth (double literal)
     STK_SRP = 0x06, // set return stack depth (double literal)
-    STK_NNN = 0x07, // ???
+    STK_RTO = 0x07, // result to object(t)
     STK_RTT = 0x08, // reg(t)->t
     STK_TTR = 0x09, // t->reg(n)
     STK_SWP = 0x0a, // swap
@@ -74,7 +74,7 @@ uint16_t stk_srp(evm_t *vm) {
 	return VM_T(vm);
 }
 
-uint16_t stk_nnn(evm_t *vm) {
+uint16_t stk_rto(evm_t *vm) {
     return VM_T(vm);
 }
 
@@ -124,7 +124,7 @@ uint16_t (*stk_fun[])(evm_t *vm) = {
     stk_drs,
     stk_ssp,
     stk_srp,
-    stk_nnn,
+    stk_rto,
     stk_rtt,
     stk_ttr,
     stk_swp,

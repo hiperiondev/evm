@@ -1,6 +1,6 @@
 /*
  * Copyright 2022 Emiliano Gonzalez LU3VEA (egonzalez . hiperion @ gmail . com))
- * * Project Site:  *
+ * * Project Site:  https://github.com/hiperiondev/evm *
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "evm.h"
+#include "evm_object.h"
 
 #define RSTK 0
 #define DSTK 1
