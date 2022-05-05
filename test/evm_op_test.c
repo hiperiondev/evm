@@ -39,6 +39,7 @@
                              } \
                              printf ("\e[93m[TEST %02d: " #str "]\e[0m (expect: 0x%"PRIx64" / result: 0x%"PRIx64")\n", idx, b, a);
 #define LABEL_TEST(str)      printf("\e[94m[-- " #str " --]\e[0m\n");
+#define NO_TEST(str)         printf("\e[1;33m   [W!] NO TEST: " #str "\e[0m\n");
 
 uint8_t evm_test_number(void) {
     evm_t *evm;
@@ -220,6 +221,8 @@ uint8_t evm_test_branch(void) {
     TEST([branch] CLL_IND rstk, tst++, (uint64_t )val, (uint64_t )0x102);
     TEST([branch] CLL_IND rstk type, tst++, (uint64_t )type, (uint64_t )LIT);
 
+    NO_TEST(objects);
+
     LABEL_TEST(END OP BRANCH);
 
     //////////////////////
@@ -235,7 +238,7 @@ uint8_t evm_test_stack(void) {
 
     LABEL_TEST(TEST OP STACK);
 
-
+    NO_TEST(op stack);
 
     LABEL_TEST(END OP STACK);
 
@@ -252,7 +255,7 @@ uint8_t evm_test_object(void) {
 
     LABEL_TEST(TEST OP OBJECT);
 
-
+    NO_TEST(objects);
 
     LABEL_TEST(END OP OBJECT);
 
@@ -269,7 +272,7 @@ uint8_t evm_test_data_types(void) {
 
     LABEL_TEST(TEST DATA TYPES);
 
-
+    NO_TEST(data types);
 
     LABEL_TEST(END DATA TYPES);
 
