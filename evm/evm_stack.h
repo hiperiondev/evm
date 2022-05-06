@@ -23,14 +23,16 @@
 
 #include "evm.h"
 
+uint8_t type;
+
 enum vm_stack {
     STK_NOP = 0x00, // t
     STK_SCN = 0x01, // n
     STK_TRS = 0x02, // r->t
-    STK_DDS = 0x03, // depth of data stack (double literal)
-    STK_DRS = 0x04, // depth of return stack (double literal)
-    STK_SSP = 0x05, // set data stack depth (double literal)
-    STK_SRP = 0x06, // set return stack depth (double literal)
+    STK_DDS = 0x03, // depth of data stack (literal)
+    STK_DRS = 0x04, // depth of return stack (literal)
+    STK_SSP = 0x05, // set data stack depth (literal)
+    STK_SRP = 0x06, // set return stack depth (literal)
     STK_RTO = 0x07, // result to object(t)
     STK_RTT = 0x08, // reg(t)->t
     STK_TTR = 0x09, // t->reg(n)
@@ -42,81 +44,78 @@ enum vm_stack {
     STK_ATT = 0x0e, // A->t
 };
 
-uint16_t stk_nop(evm_t *vm) {
-    return VM_T(vm);
+uint16_t stk_nop(evm_t *evm) {
+    return VM_T(evm);
 }
 
-uint16_t stk_scn(evm_t *vm) {
-    return VM_N(vm);
+uint16_t stk_scn(evm_t *evm) {
+    return VM_N(evm);
 }
 
-uint16_t stk_trs(evm_t *vm) {
-    return VM_R(vm);
+uint16_t stk_trs(evm_t *evm) {
+    return VM_R(evm);
 }
 
-uint16_t stk_dds(evm_t *vm) {
-    return vm->_dp;
+uint16_t stk_dds(evm_t *evm) {
+    return evm->_dp;
 }
 
-uint16_t stk_drs(evm_t *vm) {
-    return vm->_rp;
+uint16_t stk_drs(evm_t *evm) {
+    return evm->_rp;
 }
 
-uint16_t stk_ssp(evm_t *vm) {
-	uint16_t res = VM_POP(vm, d);
-	vm->_dp = res;
-	return VM_T(vm);
+uint16_t stk_ssp(evm_t *evm) {
+	uint16_t res = evm_pop(evm, DSTK, &type);
+	evm->_dp = res;
+	return VM_T(evm);
 }
 
-uint16_t stk_srp(evm_t *vm) {
-	uint16_t res = VM_POP(vm, r);
-	vm->_rp = res;
-	return VM_T(vm);
+uint16_t stk_srp(evm_t *evm) {
+	uint16_t res = evm_pop(evm, DSTK, &type);
+	evm->_rp = res;
+	return VM_T(evm);
 }
 
-uint16_t stk_rto(evm_t *vm) {
-    return VM_T(vm);
+uint16_t stk_rto(evm_t *evm) { // TODO: implement
+    return VM_T(evm);
 }
 
-uint16_t stk_rtt(evm_t *vm) {
-    return VM_T(vm);
+uint16_t stk_rtt(evm_t *evm) { // TODO: implement
+    return VM_T(evm);
 }
 
-uint16_t stk_ttr(evm_t *vm) {
-    return vm->_ds[VM_POP(vm, d)];
+uint16_t stk_ttr(evm_t *evm) { // TODO: implement
+    return VM_T(evm);
 }
 
-uint16_t stk_swp(evm_t *vm) {
-    uint16_t tmp = VM_N(vm);
-    VM_N(vm) = VM_T(vm);
+uint16_t stk_swp(evm_t *evm) {
+    uint16_t tmp = VM_N(evm);
+    VM_N(evm) = VM_T(evm);
     return tmp;
 }
 
-uint16_t stk_rtr(evm_t *vm) {
-    uint16_t tmp = vm->_ds[vm->_dp -2];
-    vm->_ds[vm->_dp -2] = VM_N(vm);
-    VM_N(vm) = VM_T(vm);
-    return tmp;
+uint16_t stk_rtr(evm_t *evm) { // TODO: implement
+    return VM_T(evm);
 }
 
-uint16_t stk_ict(evm_t *vm) {
-    return ++VM_T(vm);
+uint16_t stk_ict(evm_t *evm) {
+    return ++VM_T(evm);
 }
 
-uint16_t stk_dct(evm_t *vm) {
-    return --VM_T(vm);
+uint16_t stk_dct(evm_t *evm) {
+    return --VM_T(evm);
 }
 
-uint16_t stk_aic(evm_t *vm) {
-    ++VM_A(vm);
-    return VM_T(vm);
+uint16_t stk_aic(evm_t *evm) {
+    ++VM_A(evm);
+    return VM_T(evm);
 }
 
-uint16_t stk_att(evm_t *vm) {
-    return VM_A(vm);
+uint16_t stk_att(evm_t *evm) { // TODO: implement
+    return VM_T(evm);
 }
 
-uint16_t (*stk_fun[])(evm_t *vm) = {
+uint16_t (*stk_fun[])(evm_t *evm) = {
     stk_nop,
     stk_scn,
     stk_trs,

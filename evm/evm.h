@@ -430,6 +430,6 @@ enum vm_rc {
  uint8_t evm_push(evm_t *evm, uint64_t val, bool lit, bool stk, int8_t inc);
 uint64_t evm_pop(evm_t *evm, bool stk, uint8_t *type);
  uint8_t evm_stack_value_size(evm_t *vm, bool stk);
- uint8_t evm_check_zero(evm_t *vm);
+ uint8_t evm_check_zero(evm_t *vm, bool stack);
 
 #endif /* VM_H_ */

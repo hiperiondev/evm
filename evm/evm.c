@@ -110,7 +110,7 @@ uint8_t evm_stack_value_size(evm_t *evm, bool stk) {
     return cnt + 1;
 }
 
-uint8_t evm_check_zero(evm_t *evm) {
+uint8_t evm_check_zero(evm_t *evm, bool stack) {
     uint8_t type;
     uint64_t stack_value = evm_pop(evm, DSTK, &type);
     switch (VM_T_TYPE(evm)) {
@@ -224,25 +224,25 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     break;
 
                 case JMZ_ABS:
-                    if (evm_check_zero(evm))
+                    if (evm_check_zero(evm, DSTK))
                         VM_PC(evm) = BRC_CLL_ADDR(word);
                     return RC_OK;
                     break;
 
                 case JMZ_IND:
-                    if (evm_check_zero(evm))
+                    if (evm_check_zero(evm, DSTK))
                         VM_PC(evm) = BRC_CLL_ADDR(word) + VM_A(evm);
                     return RC_OK;
                     break;
 
                 case JNZ_ABS:
-                    if (!evm_check_zero(evm))
+                    if (!evm_check_zero(evm, DSTK))
                         VM_PC(evm) = BRC_CLL_ADDR(word);
                     return RC_OK;
                     break;
 
                 case JNZ_IND:
-                    if (!evm_check_zero(evm))
+                    if (!evm_check_zero(evm, DSTK))
                         VM_PC(evm) = BRC_CLL_ADDR(word) + VM_A(evm);
                     return RC_OK;
                     break;

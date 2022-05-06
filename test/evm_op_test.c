@@ -287,11 +287,11 @@ uint8_t evm_test_function(void) {
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
-    LABEL_TEST(TEST OP FUNCTION);
+    LABEL_TEST(TEST OP FUNCTIONS);
 
+    NO_TEST(functions);
 
-
-    LABEL_TEST(END OP FUNCTION);
+    LABEL_TEST(END OP FUNCTIONS);
 
     //////////////////////
     evm_deinit(&evm);
