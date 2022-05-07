@@ -84,8 +84,8 @@ NOTE: before any operation try to convert to type
  */
 /////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef VM_H_
-#define VM_H_
+#ifndef EVM_H_
+#define EVM_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -407,16 +407,16 @@ enum vm_status {
 enum vm_rc {
     RC_OK             = 0x00, // ok
     RC_DS_UNDER_FLOW  = 0x01, // data stack underflow
-    RC_DS_OVER_FLOW   = 0x02, // data stack over flow
-    RC_RS_OVER_FLOW   = 0x03, // return stack over flow
-    RC_RS_UNDER_FLOW  = 0x04, // return stack under flow
+    RC_DS_OVER_FLOW   = 0x02, // data stack overflow
+    RC_RS_OVER_FLOW   = 0x03, // return stack overflow
+    RC_RS_UNDER_FLOW  = 0x04, // return stack underflow
     RC_PC_UND_OVR     = 0x05, // program counter under/overflow
     RC_OP_UNKNOWN     = 0x06, // operator unknown
     RC_MEM_OVERFLOW   = 0x07, // out of memory access
     RC_IRQ            = 0x08, // irq execute
     RC_REG_UNKNOWN    = 0x09, // unknown register
     RC_OBJECT_ERROR   = 0x0a, // object not exist, not allowed type or not more heap space
-    RC_OBJECT_CONVERT = 0x0b, // object can't be converted
+    RC_OBJECT_CONVERT = 0x0b, // object can't be converted or truncated
     /////////////////////////
     RC_ERROR          = 0xfe, // generic error
     RC_BYE            = 0xff  // exit

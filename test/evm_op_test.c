@@ -24,8 +24,9 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "evm.h"
+//#include "evm.h"
 #include "evm_object.h"
+#include "evm_stack.h"
 
 #define RSTK 0
 #define DSTK 1
@@ -41,12 +42,14 @@
 #define LABEL_TEST(str)      printf("\e[94m[-- " #str " --]\e[0m\n");
 #define NO_TEST(str)         printf("\e[1;33m   [W!] NO TEST: " #str "\e[0m\n");
 
+evm_t *evm;
+uint64_t val, result, number, res;
+uint16_t op;
+uint8_t ret, type, tst, type;
+
 uint8_t evm_test_number(void) {
-    evm_t *evm;
-    uint64_t result;
-    uint64_t number;
-    uint64_t res = 0;
-    uint8_t tst = 1, type;
+    res = 0;
+    tst = 1;
 
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
@@ -110,11 +113,6 @@ uint8_t evm_test_number(void) {
 }
 
 uint8_t evm_test_branch(void) {
-    evm_t *evm;
-    uint64_t val;
-    uint16_t op;
-    uint8_t ret, type, tst = 1;
-
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
@@ -231,12 +229,12 @@ uint8_t evm_test_branch(void) {
 }
 
 uint8_t evm_test_stack(void) {
-    evm_t *evm;
-
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
     LABEL_TEST(TEST OP STACK);
+
+    op = OP_STK(STK_NOP, 0, 0, 0, 0, 0, 0);
 
     NO_TEST(op stack);
 
@@ -248,8 +246,6 @@ uint8_t evm_test_stack(void) {
 }
 
 uint8_t evm_test_object(void) {
-    evm_t *evm;
-
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
@@ -265,8 +261,6 @@ uint8_t evm_test_object(void) {
 }
 
 uint8_t evm_test_data_types(void) {
-    evm_t *evm;
-
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
@@ -282,8 +276,6 @@ uint8_t evm_test_data_types(void) {
 }
 
 uint8_t evm_test_function(void) {
-    evm_t *evm;
-
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 

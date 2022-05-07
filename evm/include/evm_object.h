@@ -23,6 +23,8 @@
 
 #include <stdint.h>
 
+#include "evm.h"
+
 extern obj_id_t obj_next;
 
 obj_id_t object_next_id(void);

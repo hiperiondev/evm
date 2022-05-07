@@ -22,11 +22,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "evm.h"
-#include "evm_functions_type_0.h"
-#include "evm_functions_type_1.h"
-#include "evm_functions_type_2.h"
+#include "evm_functions_0.h"
+#include "evm_functions_1.h"
+#include "evm_functions_2.h"
 #include "evm_stack.h"
 #include "evm_object.h"
 
@@ -287,13 +288,13 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     res = (*stk_fun[STK_OP(word)])(evm);
 
                     stk_v = evm_stack_value_size(evm, DSTK);
-                    if (stk_v < 0)
+                    if (stk_v > 0)
                         VM_STK_PNT(evm, d) += delta[STK_DS(word)] * stk_v;
                     else
                         VM_STK_PNT(evm, d) += delta[STK_DS(word)];
 
                     stk_v = evm_stack_value_size(evm, RSTK);
-                    if (stk_v < 0)
+                    if (stk_v > 0)
                         VM_STK_PNT(evm, r) += delta[STK_RS(word)] * stk_v;
                     else
                         VM_STK_PNT(evm, r) += delta[STK_RS(word)];
@@ -311,7 +312,7 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     }
 
                     if (STK_RS(word) == 0x03)
-                        VM_A(evm) = VM_T(evm);
+                        VM_A(evm) = evm_pop(evm, DSTK, &type);
                     if (STK_DS(word) == 0x03)
                         --VM_A(evm);
 
