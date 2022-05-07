@@ -252,6 +252,12 @@ uint8_t evm_test_stack(void) {
     TEST([branch] STK_NOP dec stk pt dstk, tst++, (uint64_t )evm->_dp, (uint64_t )0);
     TEST([branch] STK_NOP dec stk pt rstk, tst++, (uint64_t )evm->_rp, (uint64_t )0);
 
+    VM_A(evm) = 0x05;
+    evm_push(evm, 0x9, LITL, DSTK, 0);
+    op = OP_STK(STK_NOP, 0, 0, 0, 0, 3, 3);
+    ret = evm_step(evm, op);
+    TEST([branch] STK_NOP to A rc, tst++, (uint64_t )ret, (uint64_t )9);
+    TEST([branch] STK_NOP to A, tst++, (uint64_t )VM_A(evm), (uint64_t )8);
 
 
     NO_TEST(op stack);
