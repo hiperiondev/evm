@@ -129,6 +129,21 @@ uint8_t evm_check_zero(evm_t *evm, bool stack) {
     return RC_OK;
 }
 
+void evm_print_stack(evm_t *evm, bool stk) {
+    uint16_t n;
+
+    if (stk) {
+        for (n = 0; n < evm->ds_size; n++) {
+            printf("[%02x] %04x\n", n, evm->_ds[n]);
+        }
+
+    } else {
+        for (n = 0; n < evm->ds_size; n++) {
+            printf("[%02x] %04x\n", n, evm->_rs[n]);
+        }
+    }
+}
+
 uint8_t evm_init(evm_t **evm, uint32_t dsize, uint32_t rsize, uint32_t regsize, uint32_t progsize) {
 
     obj_next.id = 0;
@@ -149,14 +164,17 @@ uint8_t evm_init(evm_t **evm, uint32_t dsize, uint32_t rsize, uint32_t regsize, 
         return RC_ERROR;
     (*evm)->reg_size = regsize;
 
-    (*evm)->_ds = malloc(dsize * sizeof(uint16_t));
+    (*evm)->_ds = calloc(dsize, sizeof(uint16_t));
     if ((*evm)->_ds == NULL)
         return RC_ERROR;
-    (*evm)->_rs = malloc(rsize * sizeof(uint16_t));
+    (*evm)->_rs = calloc(rsize, sizeof(uint16_t));
     if ((*evm)->_rs == NULL)
         return RC_ERROR;
     (*evm)->ds_size = dsize;
     (*evm)->rs_size = rsize;
+
+    evm_push(*evm, 0x0, LITL, DSTK, 0);
+    evm_push(*evm, 0x0, LITL, RSTK, 0);
 
     (*evm)->program = malloc(progsize * sizeof(uint16_t));
     (*evm)->prog_size = progsize;
@@ -263,7 +281,7 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
             break;
 
         case FUNSTK:
-            switch (FUN_OP(word)) {
+            switch (FUN_TYPE(word)) {
 
                 case FUN_0:
                     return (*t0_fun[FUN_OP(word)])(evm, FUN_ARGQTY(word));
@@ -316,7 +334,7 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     if (STK_DS(word) == 0x03)
                         --VM_A(evm);
 
-                    return RC_OK;
+                    return res;
                     break;
             }
             break;

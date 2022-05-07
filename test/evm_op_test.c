@@ -24,14 +24,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-//#include "evm.h"
 #include "evm_object.h"
 #include "evm_stack.h"
-
-#define RSTK 0
-#define DSTK 1
-#define LITL 1
-#define OBJC 0
 
 #define TEST(str, idx, a,b)  if(a == b) { \
                                  printf ("   \e[32m[OK]\e[0m "); \
@@ -113,6 +107,8 @@ uint8_t evm_test_number(void) {
 }
 
 uint8_t evm_test_branch(void) {
+    tst = 1;
+
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
@@ -229,12 +225,34 @@ uint8_t evm_test_branch(void) {
 }
 
 uint8_t evm_test_stack(void) {
+    tst = 1;
+
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
     LABEL_TEST(TEST OP STACK);
 
     op = OP_STK(STK_NOP, 0, 0, 0, 0, 0, 0);
+    ret = evm_step(evm, op);
+    TEST([branch] STK_NOP rc, tst++, (uint64_t )ret, (uint64_t )0);
+    TEST([branch] STK_NOP dstk, tst++, (uint64_t )evm->_dp, (uint64_t )0);
+    TEST([branch] STK_NOP rstk, tst++, (uint64_t )evm->_rp, (uint64_t )0);
+
+    op = OP_STK(STK_NOP, 0, 0, 0, 0, 1, 1);
+    ret = evm_step(evm, op);
+    TEST([branch] STK_NOP inc stk ptr rc, tst++, (uint64_t )ret, (uint64_t )0);
+    TEST([branch] STK_NOP inc stk ptr dstk, tst++, (uint64_t )evm->_dp, (uint64_t )1);
+    TEST([branch] STK_NOP inc stk ptr rstk, tst++, (uint64_t )evm->_rp, (uint64_t )1);
+
+    evm_push(evm, 0, LITL, DSTK, 0);
+    evm_push(evm, 0, LITL, RSTK, 0);
+    op = OP_STK(STK_NOP, 0, 0, 0, 0, 2, 2);
+    ret = evm_step(evm, op);
+    TEST([branch] STK_NOP dec stk ptr rc, tst++, (uint64_t )ret, (uint64_t )0);
+    TEST([branch] STK_NOP dec stk pt dstk, tst++, (uint64_t )evm->_dp, (uint64_t )0);
+    TEST([branch] STK_NOP dec stk pt rstk, tst++, (uint64_t )evm->_rp, (uint64_t )0);
+
+
 
     NO_TEST(op stack);
 
@@ -246,6 +264,8 @@ uint8_t evm_test_stack(void) {
 }
 
 uint8_t evm_test_object(void) {
+    tst = 1;
+
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
@@ -261,6 +281,8 @@ uint8_t evm_test_object(void) {
 }
 
 uint8_t evm_test_data_types(void) {
+    tst = 1;
+
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 
@@ -276,6 +298,8 @@ uint8_t evm_test_data_types(void) {
 }
 
 uint8_t evm_test_function(void) {
+    tst = 1;
+
     evm_init(&evm, 100, 100, 100, 100);
     //////////////////////
 

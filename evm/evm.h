@@ -266,6 +266,7 @@ typedef struct {
 #define BRC_CLL_TYPE(x)          (x >> 11)
 #define BRC_CLL_ADDR(x)          (x & 0x07FF)
 
+#define FUN_TYPE(x)              ((x & 0x3000) >> 12)
 #define FUN_OP(x)                ((x & 0x03F0) >> 4)
 #define FUN_ARGQTY(x)            (x & 0x000F)
 
@@ -318,6 +319,10 @@ typedef struct {
 #define VM_REG(vm,x)             (vm->reg[x])
 
 //////////////////////////////////////////
+
+#define LITL 1
+#define OBJC 0
+
 #define OP_BRANCH(type, arg)                ((type << 11) | arg)
 #define OP_LITERAL(cont, value)             (0x8000 | (cont << 14) | value)
 #define OP_FUN (type, fun, arg)             (0x4000 | (type << 12) |(fun << 6) | arg)
