@@ -42,7 +42,7 @@
         +---------------------------------------------------------------+
         | F | E | D | C | B | A | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
         +---------------------------------------------------------------+
-        | 0 | c | 0 |                    LITERAL                        |  c=0 -> continue until c=1
+        | 0 | c | 0 |                    LITERAL                        |  c=1 -> continue until c=0
         +---------------------------------------------------------------+
         | 1 | c | 0 |                   OBJECT ID                       |
         +---------------------------------------------------------------+
@@ -296,7 +296,7 @@ typedef struct {
 #define VM_T_R(vm,stk)           (vm->_##stk##s[VM_STK_PNT(vm,stk)])
 #define VM_STK_PNT(vm,stk)       vm->_##stk##p
 #define VM_POP(vm,stk)           (vm->_##stk##s[VM_STK_PNT(vm,stk)--])
-#define VM_PUSH(vm,stk, x, inc)  VM_STK_PNT(vm,stk) += inc; vm->_##stk##s[VM_STK_PNT(vm,stk)] = x;
+#define VM_PUSH(vm,stk, x, inc)  vm->_##stk##s[VM_STK_PNT(vm,stk)] = x;VM_STK_PNT(vm,stk) += inc;
 #define VM_DROP(vm,stk)          (--vm->_##stk##p)
 
 #define VM_PC(vm)                (vm->pc)
@@ -319,9 +319,6 @@ typedef struct {
 #define VM_REG(vm,x)             (vm->reg[x])
 
 //////////////////////////////////////////
-
-#define LITL 1
-#define OBJC 0
 
 #define OP_BRANCH(type, arg)                ((type << 11) | arg)
 #define OP_LITERAL(cont, value)             (0x8000 | (cont << 14) | value)
@@ -372,17 +369,17 @@ enum stk_opts {
 };
 
 enum stk_type {
-    LIT_CNT = 0x00,
-    LIT_END = 0x01,
-    OBJ_CNT = 0x02,
-    OBJ_END = 0x03
+    LIT_END = 0x00,
+    LIT_CNT = 0x01,
+    OBJ_END = 0x02,
+    OBJ_CNT = 0x03
 };
 
 enum stk_prfx {
-    PFX_LIT_CNT = 0x0000,
-    PFX_LIT_END = 0x4000,
-    PFX_OBJ_CNT = 0x8000,
-    PFX_OBJ_END = 0xc000
+    PFX_LIT_END = 0x0000,
+    PFX_LIT_CNT = 0x4000,
+    PFX_OBJ_END = 0x8000,
+    PFX_OBJ_CNT = 0xc000
 };
 
 enum num_type {
@@ -436,5 +433,6 @@ enum vm_rc {
 uint64_t evm_pop(evm_t *evm, bool stk, uint8_t *type);
  uint8_t evm_stack_value_size(evm_t *vm, bool stk);
  uint8_t evm_check_zero(evm_t *vm, bool stack);
+    void evm_print_stack(evm_t *evm, bool stk, uint16_t qty);
 
 #endif /* VM_H_ */

@@ -50,49 +50,49 @@ uint8_t evm_test_number(void) {
     LABEL_TEST(TEST NUMBER [LITERAL/OBJECT]);
 
     number = 0xAA;
-    res = evm_push(evm, number, LITL, DSTK, 1);
+    res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res);
     result = evm_pop(evm, DSTK, &type);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAA;
-    res = evm_push(evm, number, LITL, DSTK, 1);
+    res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res);
     result = evm_pop(evm, DSTK, &type);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAA;
-    res = evm_push(evm, number, LITL, DSTK, 1);
+    res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res);
     result = evm_pop(evm, DSTK, &type);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAA;
-    res = evm_push(evm, number, LITL, DSTK, 1);
+    res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res)
     result = evm_pop(evm, DSTK, &type);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAAAAAAAAAA;
-    res = evm_push(evm, number, LITL, DSTK, 1);
+    res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res)
     result = evm_pop(evm, DSTK, &type);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAAAAAAAAAA;
-    res = evm_push(evm, number, OBJC, DSTK, 1);
+    res = evm_push(evm, number, OBJ, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([object] size DSTK, tst++, result, res);
     result = evm_pop(evm, DSTK, &type);
     TEST([object] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAAAAAAAAAA;
-    res = evm_push(evm, number, OBJC, RSTK, 1);
+    res = evm_push(evm, number, OBJ, RSTK, 0);
     result = evm_stack_value_size(evm, RSTK);
     TEST([object] size DSTK, tst++, result, res);
     result = evm_pop(evm, RSTK, &type);
@@ -136,14 +136,14 @@ uint8_t evm_test_branch(void) {
 
     VM_PC(evm) = 0;
     op = OP_BRANCH(JMZ_ABS, 0x07FF);
-    evm_push(evm, 0x0, LITL, DSTK, 0);
+    evm_push(evm, 0x0, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JMZ_ABS lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JMZ_ABS lit, tst++, (uint64_t)VM_PC(evm), (uint64_t )0x07FF);
 
     VM_PC(evm) = 0;
     op = OP_BRANCH(JMZ_ABS, 0x07FF);
-    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LITL, DSTK, 0);
+    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JMZ_ABS lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JMZ_ABS lit, tst++, (uint64_t )VM_PC(evm), (uint64_t )0x1);
@@ -151,7 +151,7 @@ uint8_t evm_test_branch(void) {
     VM_PC(evm) = 0;
     op = OP_BRANCH(JMZ_IND, 0x0700);
     VM_A(evm) = 0x5;
-    evm_push(evm, 0x0, LITL, DSTK, 0);
+    evm_push(evm, 0x0, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JMZ_IND lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JMZ_IND lit, tst++, (uint64_t )VM_PC(evm), (uint64_t )0x705);
@@ -159,7 +159,7 @@ uint8_t evm_test_branch(void) {
     VM_PC(evm) = 0;
     op = OP_BRANCH(JMZ_IND, 0x0700);
     VM_A(evm) = 0x05;
-    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LITL, DSTK, 0);
+    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JMZ_IND lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JMZ_IND lit, tst++, (uint64_t )VM_PC(evm), (uint64_t )0x1);
@@ -167,7 +167,7 @@ uint8_t evm_test_branch(void) {
     VM_PC(evm) = 0;
     op = OP_BRANCH(JNZ_ABS, 0x0700);
     VM_A(evm) = 0x5;
-    evm_push(evm, 0x0, LITL, DSTK, 0);
+    evm_push(evm, 0x0, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JNZ_ABS lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JNZ_ABS lit, tst++, (uint64_t )VM_PC(evm), (uint64_t )0x1);
@@ -175,7 +175,7 @@ uint8_t evm_test_branch(void) {
     VM_PC(evm) = 0;
     op = OP_BRANCH(JNZ_ABS, 0x0700);
     VM_A(evm) = 0x05;
-    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LITL, DSTK, 0);
+    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JNZ_ABS lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JNZ_ABS lit, tst++, (uint64_t )VM_PC(evm), (uint64_t )0x700);
@@ -183,7 +183,7 @@ uint8_t evm_test_branch(void) {
     VM_PC(evm) = 0;
     op = OP_BRANCH(JNZ_IND, 0x0700);
     VM_A(evm) = 0x5;
-    evm_push(evm, 0x0, LITL, DSTK, 0);
+    evm_push(evm, 0x0, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JNZ_IND lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JNZ_IND lit, tst++, (uint64_t )VM_PC(evm), (uint64_t )0x1);
@@ -191,7 +191,7 @@ uint8_t evm_test_branch(void) {
     VM_PC(evm) = 0;
     op = OP_BRANCH(JNZ_IND, 0x0700);
     VM_A(evm) = 0x05;
-    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LITL, DSTK, 0);
+    evm_push(evm, 0xAAAAAAAAAAAAAAAA, LIT, DSTK, 0);
     ret = evm_step(evm, op);
     TEST([branch] JNZ_IND lit rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] JNZ_IND lit, tst++, (uint64_t )VM_PC(evm), (uint64_t )0x705);
@@ -203,7 +203,7 @@ uint8_t evm_test_branch(void) {
     TEST([branch] CLL_ABS rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] CLL_ABS, tst++, (uint64_t)VM_PC(evm), (uint64_t )0x07FF);
     TEST([branch] CLL_ABS rstk, tst++, (uint64_t )val, (uint64_t )0x102);
-    TEST([branch] CLL_ABS rstk type, tst++, (uint64_t )type, (uint64_t )LIT);
+    TEST([branch] CLL_ABS rstk type, tst++, (uint64_t )type, (uint64_t )0);
 
     VM_PC(evm) = 0x100;
     op = OP_BRANCH(CLL_IND, 0x0700);
@@ -213,7 +213,7 @@ uint8_t evm_test_branch(void) {
     TEST([branch] CLL_IND rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] CLL_IND, tst++, (uint64_t)VM_PC(evm), (uint64_t )0x0705);
     TEST([branch] CLL_IND rstk, tst++, (uint64_t )val, (uint64_t )0x102);
-    TEST([branch] CLL_IND rstk type, tst++, (uint64_t )type, (uint64_t )LIT);
+    TEST([branch] CLL_IND rstk type, tst++, (uint64_t )type, (uint64_t )0);
 
     NO_TEST(objects);
 
@@ -244,8 +244,8 @@ uint8_t evm_test_stack(void) {
     TEST([STK_NOP] inc stk ptr dstk, tst++, (uint64_t )evm->_dp, (uint64_t )1);
     TEST([STK_NOP] inc stk ptr rstk, tst++, (uint64_t )evm->_rp, (uint64_t )1);
 
-    evm_push(evm, 0, LITL, DSTK, 0);
-    evm_push(evm, 0, LITL, RSTK, 0);
+    evm_push(evm, 0, LIT, DSTK, 0);
+    evm_push(evm, 0, LIT, RSTK, 0);
     op = OP_STK(STK_NOP, 0, 0, 0, 0, 2, 2);
     ret = evm_step(evm, op);
     TEST([STK_NOP] dec stk ptr rc, tst++, (uint64_t )ret, (uint64_t )0);
@@ -253,7 +253,7 @@ uint8_t evm_test_stack(void) {
     TEST([STK_NOP] dec stk pt rstk, tst++, (uint64_t )evm->_rp, (uint64_t )0);
 
     VM_A(evm) = 0x05;
-    evm_push(evm, 0x9, LITL, DSTK, 0);
+    evm_push(evm, 0x9, LIT, DSTK, 0);
     op = OP_STK(STK_NOP, 0, 0, 0, 0, 3, 3);
     ret = evm_step(evm, op);
     TEST([STK_NOP] to A rc, tst++, (uint64_t )ret, (uint64_t )9);
@@ -262,6 +262,12 @@ uint8_t evm_test_stack(void) {
     evm_deinit(&evm);
     evm_init(&evm, 100, 100, 100, 100);
 
+    evm_push(evm, 0x9, LIT, DSTK, 1);
+    evm_push(evm, 0x1, LIT, DSTK, 0);
+
+    op = OP_STK(STK_SCN, 0, 0, 0, 0, 0, 0);
+    ret = evm_step(evm, op);
+    TEST([STK_SCN] rc, tst++, (uint64_t )ret, (uint64_t )9);
 
     NO_TEST(op stack);
 

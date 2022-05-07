@@ -41,6 +41,5 @@ enum vm_stack {
 };
 
 extern uint16_t (*stk_fun[])(evm_t *evm);
-void evm_print_stack(evm_t *evm, bool stk);
 
 #endif /* STACK_H_ */

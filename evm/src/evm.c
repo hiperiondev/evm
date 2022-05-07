@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "evm.h"
 #include "evm_functions_0.h"
@@ -47,17 +48,20 @@ uint8_t evm_push(evm_t *evm, uint64_t val, bool lit, bool stk, int8_t stkp_inc) 
            goto end;
        }
 
-    while (!(val & (mask << (12 * len))) && len > 0) {
-        --len;
+    while (len > 0) {
+        if (!(val & (mask << (12 * len))))
+            --len;
+        else
+            break;
     }
 
     ret = len + 1;
     for (; len > 0; --len) {
         vtp = ((val & (mask << (12 * len))) >> (12 * len)) | (len == ret - 1 ? pfx_end : pfx_cnt);
         if (stk) {
-            VM_PUSH(evm, d, vtp, stkp_inc);
+            VM_PUSH(evm, d, vtp, 1);
         } else {
-            VM_PUSH(evm, r, vtp, stkp_inc);
+            VM_PUSH(evm, r, vtp, 1);
         }
     }
     vtp = (val & mask) | pfx_cnt;
@@ -129,16 +133,22 @@ uint8_t evm_check_zero(evm_t *evm, bool stack) {
     return RC_OK;
 }
 
-void evm_print_stack(evm_t *evm, bool stk) {
+void evm_print_stack(evm_t *evm, bool stk, uint16_t qty) {
     uint16_t n;
 
     if (stk) {
-        for (n = 0; n < evm->ds_size; n++) {
+        if (qty > evm->ds_size)
+            return;
+
+        for (n = 0; n < qty; n++) {
             printf("[%02x] %04x\n", n, evm->_ds[n]);
         }
 
     } else {
-        for (n = 0; n < evm->ds_size; n++) {
+        if (qty > evm->rs_size)
+            return;
+
+        for (n = 0; n < qty; n++) {
             printf("[%02x] %04x\n", n, evm->_rs[n]);
         }
     }
@@ -159,7 +169,7 @@ uint8_t evm_init(evm_t **evm, uint32_t dsize, uint32_t rsize, uint32_t regsize, 
     (*evm)->status = 0;
     (*evm)->A = 0;
 
-    (*evm)->reg = malloc(regsize * sizeof(uint32_t));
+    (*evm)->reg = calloc(regsize, sizeof(uint32_t));
     if ((*evm)->reg == NULL)
         return RC_ERROR;
     (*evm)->reg_size = regsize;
@@ -173,10 +183,7 @@ uint8_t evm_init(evm_t **evm, uint32_t dsize, uint32_t rsize, uint32_t regsize, 
     (*evm)->ds_size = dsize;
     (*evm)->rs_size = rsize;
 
-    evm_push(*evm, 0x0, LITL, DSTK, 0);
-    evm_push(*evm, 0x0, LITL, RSTK, 0);
-
-    (*evm)->program = malloc(progsize * sizeof(uint16_t));
+    (*evm)->program = calloc(progsize, sizeof(uint16_t));
     (*evm)->prog_size = progsize;
 
     if(((*evm)->object = qhashtbl(0, QHASHTBL_THREADSAFE)) == NULL)
@@ -267,7 +274,7 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     break;
 
                 case CLL_ABS:
-                    evm_push(evm, VM_PC(evm) + 1, LIT, RSTK, 1);
+                    evm_push(evm, VM_PC(evm) + 1, LIT, RSTK, 0);
                     VM_PC(evm) = BRC_CLL_ADDR(word);
                     return RC_OK;
                     break;
