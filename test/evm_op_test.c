@@ -39,7 +39,7 @@
 evm_t *evm;
 uint64_t val, result, number, res;
 uint16_t op;
-uint8_t ret, type, tst, type;
+uint8_t ret, type, tst, type, err;
 
 uint8_t evm_test_number(void) {
     res = 0;
@@ -53,49 +53,49 @@ uint8_t evm_test_number(void) {
     res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res);
-    result = evm_pop(evm, DSTK, &type);
+    result = evm_pop(evm, DSTK, &type, &err);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAA;
     res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res);
-    result = evm_pop(evm, DSTK, &type);
+    result = evm_pop(evm, DSTK, &type, &err);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAA;
     res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res);
-    result = evm_pop(evm, DSTK, &type);
+    result = evm_pop(evm, DSTK, &type, &err);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAA;
     res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res)
-    result = evm_pop(evm, DSTK, &type);
+    result = evm_pop(evm, DSTK, &type, &err);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAAAAAAAAAA;
     res = evm_push(evm, number, LIT, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([literal] size DSTK, tst++, result, res)
-    result = evm_pop(evm, DSTK, &type);
+    result = evm_pop(evm, DSTK, &type, &err);
     TEST([literal] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAAAAAAAAAA;
     res = evm_push(evm, number, OBJ, DSTK, 0);
     result = evm_stack_value_size(evm, DSTK);
     TEST([object] size DSTK, tst++, result, res);
-    result = evm_pop(evm, DSTK, &type);
+    result = evm_pop(evm, DSTK, &type, &err);
     TEST([object] on DSTK, tst++, result, number);
 
     number = 0xAAAAAAAAAAAAAAAA;
     res = evm_push(evm, number, OBJ, RSTK, 0);
     result = evm_stack_value_size(evm, RSTK);
     TEST([object] size DSTK, tst++, result, res);
-    result = evm_pop(evm, RSTK, &type);
+    result = evm_pop(evm, RSTK, &type, &err);
     TEST([object] on RSTK, tst++, result, number);
 
     //////////////////////
@@ -199,7 +199,7 @@ uint8_t evm_test_branch(void) {
     VM_PC(evm) = 0x100;
     op = OP_BRANCH(CLL_ABS, 0x07FF);
     ret = evm_step(evm, op);
-    val = evm_pop(evm, RSTK, &type);
+    val = evm_pop(evm, RSTK, &type, &err);
     TEST([branch] CLL_ABS rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] CLL_ABS, tst++, (uint64_t)VM_PC(evm), (uint64_t )0x07FF);
     TEST([branch] CLL_ABS rstk, tst++, (uint64_t )val, (uint64_t )0x102);
@@ -209,7 +209,7 @@ uint8_t evm_test_branch(void) {
     op = OP_BRANCH(CLL_IND, 0x0700);
     VM_A(evm) = 0x5;
     ret = evm_step(evm, op);
-    val = evm_pop(evm, RSTK, &type);
+    val = evm_pop(evm, RSTK, &type, &err);
     TEST([branch] CLL_IND rc, tst++, (uint64_t )ret, (uint64_t )0);
     TEST([branch] CLL_IND, tst++, (uint64_t)VM_PC(evm), (uint64_t )0x0705);
     TEST([branch] CLL_IND rstk, tst++, (uint64_t )val, (uint64_t )0x102);
@@ -264,12 +264,19 @@ uint8_t evm_test_stack(void) {
 
     evm_push(evm, 0x9, LIT, DSTK, 1);
     evm_push(evm, 0x1, LIT, DSTK, 0);
-
     op = OP_STK(STK_SCN, 0, 0, 0, 0, 0, 0);
     ret = evm_step(evm, op);
     TEST([STK_SCN] rc, tst++, (uint64_t )ret, (uint64_t )9);
 
-    NO_TEST(op stack);
+    evm_push(evm, 0x9, LIT, RSTK, 1);
+    evm_push(evm, 0x1, LIT, DSTK, 0);
+    op = OP_STK(STK_TRS, 0, 0, 0, 0, 0, 0);
+    ret = evm_step(evm, op);
+    TEST([STK_TRS] rc, tst++, (uint64_t )ret, (uint64_t )9);
+
+
+
+    NO_TEST(missing ops stack);
 
     LABEL_TEST(END OP STACK);
 

@@ -29,8 +29,9 @@ uint16_t stk_scn(evm_t *evm) {
 }
 
 uint16_t stk_trs(evm_t *evm) {
+    uint8_t err;
     uint8_t type;
-    uint16_t res = evm_pop(evm, RSTK, &type);
+    uint16_t res = evm_pop(evm, RSTK, &type, &err);
     evm_push(evm, res, LIT, DSTK, 0);
     return VM_R(evm);
 }
@@ -44,15 +45,17 @@ uint16_t stk_drs(evm_t *evm) {
 }
 
 uint16_t stk_ssp(evm_t *evm) {
+    uint8_t err;
     uint8_t type;
-    uint16_t res = evm_pop(evm, DSTK, &type);
+    uint16_t res = evm_pop(evm, DSTK, &type, &err);
     evm->_dp = res;
     return VM_T(evm);
 }
 
 uint16_t stk_srp(evm_t *evm) {
+    uint8_t err;
     uint8_t type;
-    uint16_t res = evm_pop(evm, DSTK, &type);
+    uint16_t res = evm_pop(evm, DSTK, &type, &err);
     evm->_rp = res;
     return VM_T(evm);
 }
@@ -62,8 +65,9 @@ uint16_t stk_rto(evm_t *evm) { // TODO: implement
 }
 
 uint16_t stk_rtt(evm_t *evm) {
+    uint8_t err;
     uint8_t type;
-    uint16_t reg = evm_pop(evm, DSTK, &type);
+    uint16_t reg = evm_pop(evm, DSTK, &type, &err);
     if (reg > evm->reg_size)
         return RC_REG_UNKNOWN;
 
@@ -73,9 +77,10 @@ uint16_t stk_rtt(evm_t *evm) {
 }
 
 uint16_t stk_ttr(evm_t *evm) {
+    uint8_t err;
     uint8_t type;
-    uint32_t val = evm_pop(evm, DSTK, &type);
-    uint16_t reg = evm_pop(evm, DSTK, &type);
+    uint32_t val = evm_pop(evm, DSTK, &type, &err);
+    uint16_t reg = evm_pop(evm, DSTK, &type, &err);
     if (reg > evm->reg_size)
         return RC_REG_UNKNOWN;
 
@@ -91,9 +96,10 @@ uint16_t stk_swp(evm_t *evm) {
 }
 
 uint16_t stk_rtr(evm_t *evm) {
+    uint8_t err;
     uint8_t type;
-    uint16_t reg_from = evm_pop(evm, DSTK, &type);
-    uint16_t reg_to = evm_pop(evm, DSTK, &type);
+    uint16_t reg_from = evm_pop(evm, DSTK, &type, &err);
+    uint16_t reg_to = evm_pop(evm, DSTK, &type, &err);
     if (reg_from > evm->reg_size || reg_to > evm->reg_size)
         return RC_REG_UNKNOWN;
 

@@ -76,7 +76,7 @@ uint8_t evm_push(evm_t *evm, uint64_t val, bool lit, bool stk, int8_t stkp_inc) 
     return ret;
 }
 
-uint64_t evm_pop(evm_t *evm, bool stk, uint8_t *type) {
+uint64_t evm_pop(evm_t *evm, bool stk, uint8_t *type, uint8_t *err) {
     uint8_t cnt = 0;
     uint64_t stk_val = 0;
     uint64_t value = 0;
@@ -84,6 +84,10 @@ uint64_t evm_pop(evm_t *evm, bool stk, uint8_t *type) {
     if (stk) {
         *type = VM_T_TYPE(evm);
         while ((VM_T_TYPE(evm) == LIT_CNT) | (VM_T_TYPE(evm) == OBJ_CNT)) {
+            if (VM_STK_PNT(evm,d) < 0) {
+                *err = RC_DS_UNDER_FLOW;
+                return value;
+            }
             stk_val = VM_POP(evm, d) & 0x1FFF;
             value |= stk_val << (12 * cnt++);
         }
@@ -93,6 +97,10 @@ uint64_t evm_pop(evm_t *evm, bool stk, uint8_t *type) {
     } else {
         *type = VM_R_TYPE(evm);
         while ((VM_R_TYPE(evm) == LIT_CNT) | (VM_R_TYPE(evm) == OBJ_CNT)) {
+            if (VM_STK_PNT(evm,d) < 0) {
+                *err = RC_RS_UNDER_FLOW;
+                return value;
+            }
             stk_val = VM_POP(evm, r) & 0x1FFF;
             value |= stk_val << (12 * cnt++);
         }
@@ -115,9 +123,9 @@ uint8_t evm_stack_value_size(evm_t *evm, bool stk) {
     return cnt + 1;
 }
 
-uint8_t evm_check_zero(evm_t *evm, bool stack) {
+uint8_t evm_check_zero(evm_t *evm, bool stack, uint8_t *err) {
     uint8_t type;
-    uint64_t stack_value = evm_pop(evm, DSTK, &type);
+    uint64_t stack_value = evm_pop(evm, DSTK, &type, err);
     switch (VM_T_TYPE(evm)) {
         case LIT_CNT:
         case LIT_END:
@@ -205,6 +213,7 @@ uint8_t evm_deinit(evm_t **evm) {
 
 uint8_t evm_step(evm_t *evm, uint16_t word) {
     static const int8_t delta[] = { 0, 1, -1, 0 };
+    uint8_t err;
 
     VM_PC(evm)++;
 
@@ -250,25 +259,25 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     break;
 
                 case JMZ_ABS:
-                    if (evm_check_zero(evm, DSTK))
+                    if (evm_check_zero(evm, DSTK, &err))
                         VM_PC(evm) = BRC_CLL_ADDR(word);
                     return RC_OK;
                     break;
 
                 case JMZ_IND:
-                    if (evm_check_zero(evm, DSTK))
+                    if (evm_check_zero(evm, DSTK, &err))
                         VM_PC(evm) = BRC_CLL_ADDR(word) + VM_A(evm);
                     return RC_OK;
                     break;
 
                 case JNZ_ABS:
-                    if (!evm_check_zero(evm, DSTK))
+                    if (!evm_check_zero(evm, DSTK, &err))
                         VM_PC(evm) = BRC_CLL_ADDR(word);
                     return RC_OK;
                     break;
 
                 case JNZ_IND:
-                    if (!evm_check_zero(evm, DSTK))
+                    if (!evm_check_zero(evm, DSTK, &err))
                         VM_PC(evm) = BRC_CLL_ADDR(word) + VM_A(evm);
                     return RC_OK;
                     break;
@@ -308,7 +317,7 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     uint8_t type;
 
                     if (STK_R2P(word))
-                        VM_PC(evm) = evm_pop(evm, DSTK, &type);
+                        VM_PC(evm) = evm_pop(evm, DSTK, &type, &err);
 
                     res = (*stk_fun[STK_OP(word)])(evm);
 
@@ -337,7 +346,7 @@ uint8_t evm_step(evm_t *evm, uint16_t word) {
                     }
 
                     if (STK_RS(word) == 0x03)
-                        VM_A(evm) = evm_pop(evm, DSTK, &type);
+                        VM_A(evm) = evm_pop(evm, DSTK, &type, &err);
                     if (STK_DS(word) == 0x03)
                         --VM_A(evm);
 
